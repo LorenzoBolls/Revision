@@ -22,7 +22,7 @@ using namespace std;
 //THIS IS SO THAT YOU CAN ACCESS WHERE THE FILE IS LOCATED LIKE WHICH FOLDER
 
 
-class HashTable 
+class HashTable
 {
 public:
     HashTable(size_t size);
@@ -36,17 +36,17 @@ private:
 
 HashTable::HashTable(size_t size) : table(size) {}
 
-void HashTable::insert(const string& key, size_t offset) 
+void HashTable::insert(const string& key, size_t offset)
 {
     size_t index = hashFunction(key) % table.size();
     table[index].emplace_back(key, offset);
 }
 
-list<size_t> HashTable::find(const string& key) const 
+list<size_t> HashTable::find(const string& key) const
 {
     size_t index = hashFunction(key) % table.size();
     list<size_t> offsets;
-    for (const auto& pair : table[index]) 
+    for (const auto& pair : table[index])
     {
         if (pair.first == key) {
             offsets.push_back(pair.second);
@@ -55,9 +55,9 @@ list<size_t> HashTable::find(const string& key) const
     return offsets;
 }
 
-void populateHashTable(const string& fileContents, HashTable& hashTable, size_t N) 
+void populateHashTable(const string& fileContents, HashTable& hashTable, size_t N)
 {
-    for (size_t i = 0; i <= fileContents.size() - N; i++) 
+    for (size_t i = 0; i <= fileContents.size() - N; i++)
     {
         string substring = fileContents.substr(i, N);
         hashTable.insert(substring, i);
@@ -79,20 +79,13 @@ void createRevision(istream& fold, istream& fnew, ostream& frevision) {
     string oldContents = readFile(fold);
     string newContents = readFile(fnew);
     
-    //add Sequence and add new contents to this string before printing it out
-//    string addSeq = "";
-    
     HashTable hashTable(1024); // Adjust size as needed
     populateHashTable(oldContents, hashTable, N);
     
-    
-    //MADE CHANGES HERE
-//    string finalContents = "";
-//    
-//    
-    
-    
     size_t i = 0;
+    string addSeq;
+    char delim = '^'; // Initial delimiter
+
     while (i < newContents.size()) {
         string substring = newContents.substr(i, N);
         auto offsets = hashTable.find(substring);
@@ -101,46 +94,48 @@ void createRevision(istream& fold, istream& fnew, ostream& frevision) {
             size_t longestMatchLength = 0;
             size_t bestOffset = 0;
 
-            for (size_t offset : offsets) 
-            {
+            for (size_t offset : offsets) {
                 size_t matchLength = N;
-                while (i + matchLength < newContents.size() && offset + matchLength < oldContents.size() && newContents[i + matchLength] == oldContents[offset + matchLength]) 
-                {
+                while (i + matchLength < newContents.size() && offset + matchLength < oldContents.size() && newContents[i + matchLength] == oldContents[offset + matchLength]) {
                     ++matchLength;
                 }
 
-                if (matchLength > longestMatchLength) 
-                {
+                if (matchLength > longestMatchLength) {
                     longestMatchLength = matchLength;
                     bestOffset = offset;
                 }
             }
 
+            if (!addSeq.empty()) {
+                // Output the accumulated addition string with delimiters
+                frevision << "+" << delim << addSeq << delim;
+                addSeq.clear();
+            }
+
             frevision << "#" << bestOffset << "," << longestMatchLength;
             i += longestMatchLength;
-        } 
-        else 
-        {
-            //choose delimiter not in substring
-            char delim = '^';
-            while (substring.find(delim) != string::npos) 
-            {
+        } else {
+            // Ensure delimiter is not in the substring
+            while (substring.find(delim) != string::npos) {
                 delim++;
             }
-            //MADE CHANGES
-//            finalContents += newContents[i];
-            frevision << "+" << delim << newContents[i] << delim;
-            
-            i++;
 
+            addSeq += newContents[i];
+            i++;
         }
     }
-//    
+
+    if (!addSeq.empty()) {
+        // Output any remaining accumulated addition string with delimiters
+        frevision << "+" << delim << addSeq << delim;
+    }
+}
+
+//
 //    if (!finalContents.empty())
 //        {
 //            frevision << "+" << delim << finalContents << delim;
 //        }
-}
 
 
 bool getInt(istream& inf, int& n)
@@ -320,7 +315,7 @@ int main()
     //maybe make two different folders
     
     string pathStem = "/Users/lorenzobolls/Desktop/CS 32/project 4/project 4/";
-    assert(runtest(pathStem+"greeneggs1.txt", pathStem+"greeneggs2.txt", pathStem+"greeneggsmyrevisionfileNEWWWW.txt", pathStem+"greeneggsmynewfile2NEWWW.txt"));
+    assert(runtest(pathStem+"greeneggs1.txt", pathStem+"greeneggs2.txt", pathStem+"greeneggsREVISION.txt", pathStem+"greeneggsNEWFILE.txt"));
     cerr << "Test PASSED" << endl;
 }
 
@@ -348,7 +343,7 @@ int main()
  a vector of lists and within the lists are a string and an int
  */
 
-
+//
 //void runtest(string oldtext, string newtext)
 //{
 //    istringstream oldFile(oldtext);
@@ -376,6 +371,3 @@ int main()
 //            "XYABCDEFGHIJBLETCHPQRSTUVPQRSTQQ/OK");
 //    cout << "All tests passed" << endl;
 //}
-
-
-
