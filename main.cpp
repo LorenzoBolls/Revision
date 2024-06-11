@@ -48,7 +48,8 @@ list<size_t> HashTable::find(const string& key) const
     list<size_t> offsets;
     for (const auto& pair : table[index])
     {
-        if (pair.first == key) {
+        if (pair.first == key) 
+        {
             offsets.push_back(pair.second);
         }
     }
@@ -78,18 +79,18 @@ void createRevision(istream& fold, istream& fnew, ostream& frevision) {
     const size_t N = 8; // Length of sequences to hash
     string oldContents = readFile(fold);
     string newContents = readFile(fnew);
-    
+
     HashTable hashTable(1024); // Adjust size as needed
     populateHashTable(oldContents, hashTable, N);
-    
+
     size_t i = 0;
     string addSeq;
-    char delim = '^'; // Initial delimiter
+    char delim = 33; // Initial delimiter
 
     while (i < newContents.size()) {
         string substring = newContents.substr(i, N);
         auto offsets = hashTable.find(substring);
-        
+
         if (!offsets.empty()) {
             size_t longestMatchLength = 0;
             size_t bestOffset = 0;
@@ -107,6 +108,15 @@ void createRevision(istream& fold, istream& fnew, ostream& frevision) {
             }
 
             if (!addSeq.empty()) {
+                int i = 0;
+                while (i < 1) {
+                    if (addSeq.find(delim) == string::npos) {
+                        i++;
+                    } else {
+                        delim++;
+                    }
+                }
+
                 // Output the accumulated addition string with delimiters
                 frevision << "+" << delim << addSeq << delim;
                 addSeq.clear();
@@ -115,21 +125,29 @@ void createRevision(istream& fold, istream& fnew, ostream& frevision) {
             frevision << "#" << bestOffset << "," << longestMatchLength;
             i += longestMatchLength;
         } else {
-            // Ensure delimiter is not in the substring
-            while (substring.find(delim) != string::npos) {
-                delim++;
-            }
-
             addSeq += newContents[i];
             i++;
         }
     }
 
     if (!addSeq.empty()) {
+        
+        // Continue to find a new delimiter until it's not in the string
+        int i = 0;
+        while (i < 1) {
+            if (addSeq.find(delim) == string::npos) {
+                i++;
+            } else {
+                delim++;
+            }
+        }
+
         // Output any remaining accumulated addition string with delimiters
         frevision << "+" << delim << addSeq << delim;
     }
 }
+
+
 
 //
 //    if (!finalContents.empty())
@@ -171,8 +189,7 @@ bool getCommand(istream& inf, char& cmd, char& delim, int& length, int& offset)
     return false;
 }
 
-//IF YOU WANT TO PRINT OUT "\n" WRITE OUT "\\n" VERY IMPORTANT
-//WHENEVER YOU HAVE A BACKSLASH ALWAYS USE \\
+
 
 bool revise(istream& fold, istream& frevision, ostream& fnew) {
     // Read the entire old file into a string
@@ -316,7 +333,10 @@ int main()
     
     string pathStem = "/Users/lorenzobolls/Desktop/CS 32/project 4/project 4/";
     string path2 = "/Users/lorenzobolls/Desktop/TEST CASES/";
-    assert(runtest(pathStem+"mallmart1.txt", pathStem+"mallmart2.txt", path2+"mallmartREVISION.txt", path2+"mallmartNEWFILE.txt"));
+    
+    string pathG32 = "/w/home.25/home/lorenzobolls/cs32/project4/";
+    
+    assert(runtest(pathG32+"strange1.txt", pathG32+"strange2.txt", pathG32+"strangeREVISIONSSSSS.txt", pathG32+"strangeNEWFILESSS.txt"));
     cerr << "Test PASSED" << endl;
 }
 
@@ -343,7 +363,7 @@ int main()
  
  a vector of lists and within the lists are a string and an int
  */
-
+//
 //
 //void runtest(string oldtext, string newtext)
 //{
