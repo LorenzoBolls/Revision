@@ -315,7 +315,8 @@ int main()
     //maybe make two different folders
     
     string pathStem = "/Users/lorenzobolls/Desktop/CS 32/project 4/project 4/";
-    assert(runtest(pathStem+"greeneggs1.txt", pathStem+"greeneggs2.txt", pathStem+"greeneggsREVISION.txt", pathStem+"greeneggsNEWFILE.txt"));
+    string path2 = "/Users/lorenzobolls/Desktop/TEST CASES/";
+    assert(runtest(pathStem+"mallmart1.txt", pathStem+"mallmart2.txt", path2+"mallmartREVISION.txt", path2+"mallmartNEWFILE.txt"));
     cerr << "Test PASSED" << endl;
 }
 
